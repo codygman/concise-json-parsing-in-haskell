@@ -266,15 +266,6 @@ albums ^.. \item -> (key "items" . values . filtered (anyOf (key "available_mark
 albums ^.. key "items" . values . filtered (anyOf (key "available_markets" . values . _String) (`elem` ["HK", "LU"])) . key "name" . _String
 ```
 
-Taking it to the logical extreme and code golfing as much as possible (We were already almost there):
-
-```haskell
--- original
-albums ^.. key "items" . values . filtered (anyOf (key "available_markets" . values . _String) (`elem` ["HK", "LU"])) . key "name" . _String
-
--- replace key with more general ix (caution: ix being more general means you could have ambiguous types and have to resort to manually annotating them)
-albums ^.. ix "items" . values . filtered (anyOf (ix "available_markets" . values . _String) (`elem` ["HK", "LU"])) . ix "name" . _String
-```
 
 If you are still a little lost with either the python list comprehensions, the final Haskell lens version, or both... Not to worry! I've included an ascii diagram of what is happening in the last example for both:
 
@@ -299,4 +290,26 @@ albums ^.. key "items" . values . filtered (anyOf (key "available_markets" . val
                               |                                                                    ____/ \___________________________________________
                     3. and all of key "items" values                                              /                                                  \
                                                                                                5. with the condition those values are anyOf ("HK","LU")
+```
+
+Remember the ideal version with named variables? Here is what it looks like after taking advantage of symbols, function composition, and currying:
+
+```haskell
+λ> let items= key "items" . values
+λ> let availableMarkets = key "available_markets" . values . _String
+λ> let isHkOrLU = (`elem` ["HK","LU"])
+λ> let albumName = key "name" . _String
+λ> albums ^.. items . filtered (anyOf availableMarkets isHkOrLU) . albumName
+["Taste The Feeling (Avicii Vs. Conrad Sewell)","Pure Grinding (iSHi Remix)","Broken Arrows (Remixes)","For A Better Day (Remixes)","For A Better Day (KSHMR Remix)"]
+
+```
+
+We can code golf the one-liner version a tiny bit, but it was already almost as small as possible:
+
+```haskell
+-- original
+albums ^.. key "items" . values . filtered (anyOf (key "available_markets" . values . _String) (`elem` ["HK", "LU"])) . key "name" . _String
+
+-- replace key with more general ix (caution: ix being more general means you could have ambiguous types and have to resort to manually annotating them)
+albums ^.. ix "items" . values . filtered (anyOf (ix "available_markets" . values . _String) (`elem` ["HK", "LU"])) . ix "name" . _String
 ```
