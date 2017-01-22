@@ -180,14 +180,16 @@ Yes, but as I've just show you they can be totally avoided if you want. However,
 
 Part 2: Lens symbols and function composition
 
+Revisiting "I'll start off with the simplest task I can think of, getting the value of the href key in the top level json object":
+
 I'm going to move a little quicker now that we've got basics out of the way. Let's start by converting our first example to use the symbol version of preview called `^?`.
 
 ```haskell
 -- original
 preview (\obj -> key "href" obj) albums
 
--- with symbol
-albums ^? (\obj -> key "href" obj)
+-- using symbol (notice the parens no longer necessary)
+albums ^? \obj -> key "href" obj
 ```
 
 Try to make sure you see what happened above before moving on, otherwise you're gonna have a bad time.
@@ -195,7 +197,7 @@ Try to make sure you see what happened above before moving on, otherwise you're 
 We'll also do an `eta reduction` that takes advantage of Haskell's currying. That all just means we don't have to have an explicit lambda and can count on obj to be passed in implicitly because it was already on the end of the lambda anyway.
 
 ```haskell
-albums ^? (key "href")
+albums ^? key "href"
 ```
 
 On the next examples I'll do these 3 transformations in line, one after another.
@@ -207,10 +209,10 @@ Revisiting "Now we'll be a little more ambitious and descend into the key items,
 preview (\obj -> key "items" (nth 0 (key "album_type" (_String obj)))) albums
 
 -- using symbol
-albums ^? (\obj -> key "items" (nth 0 (key "album_type" (_String obj))))
+albums ^? \obj -> key "items" (nth 0 (key "album_type" (_String obj)))
 
 -- using symbol and function composition
-preview (\obj -> (key "items" . nth 0 . key "album_type" . _String) obj) albums
+albums ^? \obj -> (key "items" . nth 0 . key "album_type" . _String) obj
 
 -- using symbol, function composition and currying (notice parens aren't necessary anymore)
 albums ^? key "items" . nth 0 . key "album_type" . _String
