@@ -77,6 +77,48 @@ Of course we also have type safety in this example. If the height values are het
 
     print $ albums ^.. key "items" . values . filtered (anyOf (key "available_markets" . values . _String) (\i -> i == "HK" || i == "LU")) . key "name" . _String
 
+   -- whoops we were re-implementing the elem function
+    print $ albums ^.. key "items" . values . filtered (anyOf (key "available_markets" . values . _String) (`elem` ["HK", "LU"])) . key "name" . _String
+
+    -- I personally find it kind of confusing, but here is the version using toListOf rather than ^..
+    print $ toListOf (key "items" . values . filtered (anyOf (key "available_markets" . values . _String) (`elem` ["HK", "LU"])) . key "name" . _String) (albums)
+
+  {-
+An analysis of the above:
+
+First Python. I've annotated which part of the for the individual accessors correlate to, because it was most confusing for me. I'm not sure if this is the case in general though.
+
+[ image['height'] for item in albums['items'] for image in item['images'] if item["available_markets"] in ["HK","LU"] ]
+  \___________/       \__/        \________/      \___/    \____________/ \_________________________________________/
+    ___|____        ___|______    ____|____     ____|____      ____|____                      ____|____
+    |Step #6|       | Step #2|    |Step #1|     |Step #5|      |Step #3|                     |Step #4|
+    *********       *********     *********     *********      *********                     *********
+
+Next Haskell:
+
+albums ^.. key "items" . values . filtered (anyOf (key "available_markets" . values . _String) (`elem` ["HK", "LU"])) . key "name" . _String
+        |    \  /          \       \___\______|___\_____________________\_|_____|_________|__/  \                   | \                     \
+       /      \/            \__________ \     |    \                     \|     |         /\     \__________________/  \_____________________\
+   1. toListOf \                       | \    |     \_____________________|     \        /  \           |                      |
+               |                       |  \___|          \                 \     \      /    \_______   |            6. Then finally with the resulting filtered items values, give us the name of each filtered items values
+               > 2. using key "items"  |     \            \                /\     \    |             \  |
+                              _________/ 4. filter any of key available markets values that are String  |
+                              |                                                                    ____/ \___________________________________________
+                    3. and all of key "items" values                                              /                                                  \
+                                                                                               5. with the condition those values are anyOf ("HK","LU")
+
+TODO incorporate feedback from #haskell-beginners
+[19:04] <<redacted>> codygman: Lenses aren't inherently left to right
+[19:05] <codygman> <redacted>: Can you give me an example, I'll have to include that. I think the intuition works for the subset of "parsing json with lenses" tasks I've been doing thus far, but I don't want to mislead others and harm their larger understanding if they decide to attain it.
+[19:06] <codygman> tmciver: I think the lines crossing issue will go away when I convert to graphic form
+[19:06] <<redacted>> codygman: You data structure just happens to be nested; which makes your lens composition with (.) feel natural.
+[19:09] <codygman> <redacted>: Okay, I think I can get away with "When working with nested structures such as how json tends to be, lens composition will usually feel natural and be left to right."
+[19:10] <<redacted>> It's better just not to mention it altogether not to confuse them.
+[19:10] <codygman> Gurkenglas: FWIW, when you explained your joke I found it hilarious
+[19:14] <codygman> <redacted>: I'm not sure I agree, but to be honest I'll have to think on that one.
+  -}
+
+
   -- the python one-liner of the above haskell/lens one-liner is:
   -- [item['name'] for item in albums['items'] if "HK" in item['available_markets'] or "LU" in item['available_markets']]
   -- albums ^.. key "items" . values . filtered (anyOf (key "available_markets" . values . _String) (\i -> i == "HK" || i == "LU")) . key "name" . _String
@@ -85,6 +127,7 @@ Of course we also have type safety in this example. If the height values are het
   -- albums ^.. ix "items" . values . filtered (anyOf (ix "available_markets" . values . _String) (flip any ["HK", "LU"] . (==))) . ix "name" . _String
   -- albums ^.. ix "items" . values . filtered (anyOf (ix "available_markets" . values . _String) (flip any ["HK", "LU"] . (==))) . ix "name" . _String
   -- albums ^.. ix "items" . values . filtered (anyOf (ix "available_markets" . values . _String) ((`any` ["HK", "LU"]) . (==))) . ix "name" . _String
+  -- albums ^.. key "items" . values . filtered (anyOf (key "available_markets" . values . _String) (`elem` ["HK", "LU"])) . key "name" . _String
 
   -- of course I would have advised taking the above one step at a time unless this was a one-off thing in the repl
   let items' = key "items" . values
