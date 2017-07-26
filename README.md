@@ -134,7 +134,7 @@ end
 puts  list
 
 ```                                                                                              
-
+```python
 # for loop version
 lst = []
 for name in albums['items']:
