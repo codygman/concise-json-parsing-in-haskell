@@ -124,22 +124,22 @@ Python:
 >>> [item['name'] for item in albums['items']]
 [u'Taste The Feeling (Avicii Vs. Conrad Sewell)', u'Pure Grinding (iSHi Remix)', u'Broken Arrows (Remixes)', u'For A Better Day (Remixes
 )', u'For A Better Day (KSHMR Remix)']
-```  
+```
 
+```python                                                                                  
+# for loop version
+lst = []
+for name in albums['items']:
+    lst.append(name)
+```
+Ruby:
 ```ruby
 list = []
 for name in albums['items']
   list.push(name)
 end
 puts  list
-
-```                                                                                              
-```python
-# for loop version
-lst = []
-for name in albums['items']:
-    lst.append(name)
-```
+```  
 
 Haskell:
 ```
