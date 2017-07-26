@@ -170,6 +170,7 @@ for item in albums['items']:
         lst.append(image['height'])
 ```
 
+Ruby:
 ```ruby
 list2 = []
 for item in albums['items']
