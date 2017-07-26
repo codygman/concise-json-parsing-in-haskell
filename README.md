@@ -100,7 +100,8 @@ u'single'
 
 Ruby:
 
-```puts albums['items'][0]['album_type']
+```
+puts albums['items'][0]['album_type']
 
 Example two is: single
 ```
@@ -122,7 +123,8 @@ Python:
 # list comprehension version
 >>> [item['name'] for item in albums['items']]
 [u'Taste The Feeling (Avicii Vs. Conrad Sewell)', u'Pure Grinding (iSHi Remix)', u'Broken Arrows (Remixes)', u'For A Better Day (Remixes
-)', u'For A Better Day (KSHMR Remix)']   
+)', u'For A Better Day (KSHMR Remix)']
+```  
 
 ```ruby
 list = []
