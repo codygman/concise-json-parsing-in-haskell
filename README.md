@@ -67,6 +67,15 @@ First in Python:
 u'https://api.spotify.com/v1/artists/1vCWHaC5f2uS3yhpwWbIA6/albums?offset=0&limit=5&album_type=single&market=ES'
 ```
 
+Second, in Ruby:
+
+```ruby
+require 'json'
+albums = JSON.parse(File.read('albums.json'))
+puts albums['href']
+u'https://api.spotify.com/v1/artists/1vCWHaC5f2uS3yhpwWbIA6/albums?offset=0&limit=5&album_type=single&market=ES'
+```
+
 In Haskell:
 
 ```
@@ -89,6 +98,13 @@ Python:
 u'single'
 ```
 
+Ruby:
+
+```puts albums['items'][0]['album_type']
+
+Example two is: single
+```
+
 Haskell:
 
 ```haskell
@@ -106,7 +122,16 @@ Python:
 # list comprehension version
 >>> [item['name'] for item in albums['items']]
 [u'Taste The Feeling (Avicii Vs. Conrad Sewell)', u'Pure Grinding (iSHi Remix)', u'Broken Arrows (Remixes)', u'For A Better Day (Remixes
-)', u'For A Better Day (KSHMR Remix)']                                                                                                 
+)', u'For A Better Day (KSHMR Remix)']   
+
+```ruby
+list = []
+for name in albums['items']
+  list.push(name)
+end
+puts  list
+
+```                                                                                              
 
 # for loop version
 lst = []
@@ -143,12 +168,21 @@ for item in albums['items']:
         lst.append(image['height'])
 ```
 
+```ruby
+list2 = []
+for item in albums['items']
+  for image in item['images']
+   list2.push(image['height'])
+  end
+end
+```
+
 ```haskell
 λ> toListOf (\obj -> key "items" (values (key "images" (values (key "height" (_Number obj)))))) albums
 [640.0,300.0,64.0,640.0,300.0,64.0,640.0,300.0,64.0,640.0,300.0,64.0,640.0,300.0,64.0]
 ```
 
-Now let's do something like we'd actually be asked to do at our jobs. 
+Now let's do something like we'd actually be asked to do at our jobs.
 
 Boss: What albums are available in the HK and LU markets?!?
 
@@ -170,7 +204,7 @@ Of course for me, this is well past the point where I usually start naming my le
 λ> let availableMarkets album = key "available_markets" (values (_String album))
 λ> let isHkOrLU i = i `elem` ["HK","LU"]
 λ> let albumName album = key "name" (_String album)
-λ> toListOf (\album -> items (filtered (anyOf availableMarkets isHkOrLU) (albumName album))) albums 
+λ> toListOf (\album -> items (filtered (anyOf availableMarkets isHkOrLU) (albumName album))) albums
 ["Taste The Feeling (Avicii Vs. Conrad Sewell)","Pure Grinding (iSHi Remix)","Broken Arrows (Remixes)","For A Better Day (Remixes)","For A Better Day (KSHMR Remix)"]
 ```
 

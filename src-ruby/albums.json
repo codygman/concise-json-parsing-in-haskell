@@ -1,6 +1,4 @@
-albums
 {
-
     "href": "https://api.spotify.com/v1/artists/1vCWHaC5f2uS3yhpwWbIA6/albums?offset=0&limit=5&album_type=single&market=ES",
     "items": [
         {
